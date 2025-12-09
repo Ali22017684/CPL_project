@@ -15,10 +15,10 @@ def get_moves(board):
         return []
 
     directions = [
-        (zero_index - 3, zero_index >= 3),       # Up
-        (zero_index + 1, zero_index % 3 != 2),    # Righ
-        (zero_index + 3, zero_index < 6),         # Down
-        (zero_index - 1, zero_index % 3 != 0)     # Left
+        (zero_index - 3, zero_index >= 3),    
+        (zero_index + 1, zero_index % 3 != 2),  
+        (zero_index + 3, zero_index < 6),       
+        (zero_index - 1, zero_index % 3 != 0)    
     ]
 
     moves = []
