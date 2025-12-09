@@ -6,23 +6,21 @@ import sys
 
 sys.setrecursionlimit(20000) 
 
-goal_state = [1, 2, 3, 4, 5, 6, 7, 8, 0]
+GOAL_STATE = [1, 2, 3, 4, 5, 6, 7, 8, 0]
 
 def get_moves(board):
-    """ Pure Function: بترجع الحركات المتاحة من غير تعديل الأصل """
-    moves = []
     try:
         zero_index = board.index(0)
     except ValueError:
         return []
-
     directions = [
-        (zero_index - 3, zero_index >= 3),       
-        (zero_index + 1, zero_index % 3 != 2),    
-        (zero_index + 3, zero_index < 6),         
-        (zero_index - 1, zero_index % 3 != 0)     
+        (zero_index - 3, zero_index >= 3),       # Up
+        (zero_index + 1, zero_index % 3 != 2),    # Right
+        (zero_index + 3, zero_index < 6),         # Down
+        (zero_index - 1, zero_index % 3 != 0)     # Left
     ]
 
+    moves = []
     for target_idx, condition in directions:
         if condition:
             new_board = list(board) 
@@ -31,61 +29,53 @@ def get_moves(board):
             
     return moves
 
-def solve_recursive(queue, visited_set):
-    """
-    دالة الحل باستخدام التكرار الذاتي (Recursion) بدلاً من Loop
-    queue: قائمة تحتوي على (Current_Board, Path_So_Far)
-    visited_set: مجموعة الأماكن التي زرناها
-    """
-    
-    
-    if not queue:
-        return None
-
-    current_item = queue[0]
-    rest_of_queue = queue[1:]
-
-    current_board, path = current_item
-
-    if current_board == goal_state:
-        return path
-    
-    possible_moves = get_moves(current_board)
-
-    new_entries = []
-    for move in possible_moves:
-        move_tuple = tuple(move)
-        if move_tuple not in visited_set:
-            visited_set.add(move_tuple)
-            new_path = path + [move]    
-            new_entries.append((move, new_path))
-    
-    return solve_recursive(rest_of_queue + new_entries, visited_set)
-
-
-
-def start_functional_solver(start_board):
-    
-    initial_queue = [(start_board, [start_board])]
-    
-    initial_visited = {tuple(start_board)}
-    
-    return solve_recursive(initial_queue, initial_visited)
-
-
 def generate_random_solvable_board(steps=10):
-    current = goal_state.copy()
+    """
+    Pure-ish function for shuffling: returns a new, shuffled board.
+    """
+    current = GOAL_STATE.copy()
     for _ in range(steps):
         possible = get_moves(current)
         current = random.choice(possible)
     return current
 
+def solve_recursive(queue, visited_set): 
+    if not queue:
+        return None
+    current_item = queue[0]
+    rest_of_queue = queue[1:]
+
+    current_board, path = current_item
+    if current_board == GOAL_STATE:
+        return path
+    
+    possible_moves = get_moves(current_board)
+
+    new_entries = []
+    updated_visited_set = visited_set.copy() 
+    
+    for move in possible_moves:
+        move_tuple = tuple(move)
+        if move_tuple not in visited_set:
+            updated_visited_set.add(move_tuple)
+            new_path = path + [move]    
+            new_entries.append((move, new_path))
+    
+    return solve_recursive(rest_of_queue + new_entries, updated_visited_set)
+
+
+def start_functional_solver(start_board):
+    initial_queue = [(start_board, [start_board])]
+    initial_visited = {tuple(start_board)}
+    
+    return solve_recursive(initial_queue, initial_visited)
+
 class EightPuzzleGUI:
     def __init__(self, root):
         self.root = root
         self.root.title("8-Puzzle (Functional/Recursive Solver)")
-        
-        self.current_state = goal_state.copy()
+
+        self.current_state = GOAL_STATE.copy()
         self.buttons = []
         
         self.create_widgets()
@@ -106,12 +96,10 @@ class EightPuzzleGUI:
             if (i + 1) % 3 == 0:
                 self.buttons.append(row_buttons)
                 row_buttons = []
-
-        # Controls
         frame_controls = tk.Frame(self.root)
         frame_controls.pack(pady=10)
 
-        shuffle_btn = tk.Button(frame_controls, text="Shuffle (10 Steps)", 
+        shuffle_btn = tk.Button(frame_controls, text="Shuffle (12 Steps)", 
                               bg='#FF9800', fg='white', font=('Arial', 11),
                               command=self.shuffle_board)
         shuffle_btn.pack(side=tk.LEFT, padx=5)
@@ -162,7 +150,7 @@ class EightPuzzleGUI:
                 
         except RecursionError:
             self.status_label.config(text="Stack Overflow!", fg="red")
-            messagebox.showerror("Error", "Recursion Limit Exceeded!\nThe puzzle is too hard for pure recursion in Python.")
+            messagebox.showerror("Error", "Recursion Limit Exceeded!\nThis is a limitation of pure recursion for deep searches in Python.")
 
 if __name__ == "__main__":
     root = tk.Tk()
