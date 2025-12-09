@@ -9,7 +9,6 @@ sys.setrecursionlimit(20000)
 goal_state = [1, 2, 3, 4, 5, 6, 7, 8, 0]
 
 def get_moves(board):
-    """ Pure Function: بترجع الحركات المتاحة من غير تعديل الأصل """
     moves = []
     try:
         zero_index = board.index(0)
@@ -32,12 +31,6 @@ def get_moves(board):
     return moves
 
 def solve_recursive(queue, visited_set):
-    """
-    دالة الحل باستخدام التكرار الذاتي (Recursion) بدلاً من Loop
-    queue: قائمة تحتوي على (Current_Board, Path_So_Far)
-    visited_set: مجموعة الأماكن التي زرناها
-    """
-    
     
     if not queue:
         return None
