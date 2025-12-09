@@ -13,6 +13,7 @@ def get_moves(board):
         zero_index = board.index(0)
     except ValueError:
         return []
+
     directions = [
         (zero_index - 3, zero_index >= 3),       # Up
         (zero_index + 1, zero_index % 3 != 2),    # Right
@@ -30,29 +31,29 @@ def get_moves(board):
     return moves
 
 def generate_random_solvable_board(steps=10):
-    """
-    Pure-ish function for shuffling: returns a new, shuffled board.
-    """
     current = GOAL_STATE.copy()
     for _ in range(steps):
         possible = get_moves(current)
         current = random.choice(possible)
     return current
 
+
 def solve_recursive(queue, visited_set): 
     if not queue:
         return None
+
     current_item = queue[0]
     rest_of_queue = queue[1:]
 
     current_board, path = current_item
+
     if current_board == GOAL_STATE:
         return path
     
     possible_moves = get_moves(current_board)
 
     new_entries = []
-    updated_visited_set = visited_set.copy() 
+    updated_visited_set = visited_set.copy()
     
     for move in possible_moves:
         move_tuple = tuple(move)
@@ -70,11 +71,12 @@ def start_functional_solver(start_board):
     
     return solve_recursive(initial_queue, initial_visited)
 
+
 class EightPuzzleGUI:
     def __init__(self, root):
         self.root = root
         self.root.title("8-Puzzle (Functional/Recursive Solver)")
-
+        
         self.current_state = GOAL_STATE.copy()
         self.buttons = []
         
@@ -96,6 +98,7 @@ class EightPuzzleGUI:
             if (i + 1) % 3 == 0:
                 self.buttons.append(row_buttons)
                 row_buttons = []
+
         frame_controls = tk.Frame(self.root)
         frame_controls.pack(pady=10)
 
@@ -139,6 +142,7 @@ class EightPuzzleGUI:
 
             if path:
                 self.status_label.config(text=f"Solved! ({len(path)-1} moves)", fg="green")
+                
                 for step_board in path:
                     self.current_state = step_board
                     self.update_display(step_board)
