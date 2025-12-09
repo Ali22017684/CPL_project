@@ -28,7 +28,6 @@ def get_moves(board):
         new_board = board.copy()
         new_board[zero_index], new_board[zero_index + 3] = new_board[zero_index + 3], new_board[zero_index]
         moves.append(new_board)
-    # LEFT
     if zero_index % 3 != 0:
         new_board = board.copy()
         new_board[zero_index], new_board[zero_index - 1] = new_board[zero_index - 1], new_board[zero_index]
@@ -37,9 +36,6 @@ def get_moves(board):
     return moves
 
 def generate_random_solvable_board(steps=20):
-    """
-    بتبدأ من الحل، وتتحرك حركات عشوائية عشان تلخبط اللوحة
-    """
     current = goal_state.copy()
     for _ in range(steps):
         possible_moves = get_moves(current)
