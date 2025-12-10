@@ -8,17 +8,19 @@ sys.setrecursionlimit(20000)
 
 GOAL_STATE = [1, 2, 3, 4, 5, 6, 7, 8, 0]
 
+
 def get_moves(board):
+
     try:
         zero_index = board.index(0)
     except ValueError:
         return []
 
     directions = [
-        (zero_index - 3, zero_index >= 3),    
-        (zero_index + 1, zero_index % 3 != 2),  
-        (zero_index + 3, zero_index < 6),       
-        (zero_index - 1, zero_index % 3 != 0)    
+        (zero_index - 3, zero_index >= 3),      
+        (zero_index + 1, zero_index % 3 != 2), 
+        (zero_index + 3, zero_index < 6),      
+        (zero_index - 1, zero_index % 3 != 0)   
     ]
 
     moves = []
@@ -41,7 +43,6 @@ def generate_random_solvable_board(steps=10):
 def solve_recursive(queue, visited_set): 
     if not queue:
         return None
-
     current_item = queue[0]
     rest_of_queue = queue[1:]
 
@@ -52,16 +53,11 @@ def solve_recursive(queue, visited_set):
     
     possible_moves = get_moves(current_board)
 
-    new_entries = []
+    valid_moves = list(filter(lambda m: tuple(m) not in visited_set, possible_moves))
+
     updated_visited_set = visited_set.copy()
-    
-    for move in possible_moves:
-        move_tuple = tuple(move)
-        if move_tuple not in visited_set:
-            updated_visited_set.add(move_tuple)
-            new_path = path + [move]    
-            new_entries.append((move, new_path))
-    
+    updated_visited_set.update(map(tuple, valid_moves))
+    new_entries = list(map(lambda m: (m, path + [m]), valid_moves))
     return solve_recursive(rest_of_queue + new_entries, updated_visited_set)
 
 
@@ -73,9 +69,9 @@ def start_functional_solver(start_board):
 
 
 class EightPuzzleGUI:
-    def __init__(self, root):
+    def _init_(self, root):
         self.root = root
-        self.root.title("8-Puzzle (Functional/Recursive Solver)")
+        self.root.title("8-Puzzle")
         
         self.current_state = GOAL_STATE.copy()
         self.buttons = []
@@ -106,13 +102,12 @@ class EightPuzzleGUI:
                               bg='#FF9800', fg='white', font=('Arial', 11),
                               command=self.shuffle_board)
         shuffle_btn.pack(side=tk.LEFT, padx=5)
-
         solve_btn = tk.Button(frame_controls, text="Solve Recursively", 
-                              bg='#9C27B0', fg='white', font=('Arial', 11),
-                              command=self.start_solving_animation)
+                            bg='#9C27B0', fg='white', font=('Arial', 11),
+                            command=self.start_solving_animation)
         solve_btn.pack(side=tk.LEFT, padx=5)
 
-        self.status_label = tk.Label(self.root, text="Functional Mode. Ready.", font=('Arial', 10), fg="purple")
+        self.status_label = tk.Label(self.root, text="Functional Mode (Higher Order). Ready.", font=('Arial', 10), fg="purple")
         self.status_label.pack(pady=5)
 
     def update_display(self, board):
@@ -134,7 +129,7 @@ class EightPuzzleGUI:
         self.status_label.config(text="Board Shuffled.", fg="purple")
 
     def start_solving_animation(self):
-        self.status_label.config(text="Thinking (Recursively)...", fg="orange")
+        self.status_label.config(text="Thinking (Recursively + Map/Filter)...", fg="orange")
         self.root.update()
 
         try:
@@ -147,16 +142,16 @@ class EightPuzzleGUI:
                     self.current_state = step_board
                     self.update_display(step_board)
                     time.sleep(0.3)
-                messagebox.showinfo("Success", "Puzzle Solved using Functional Paradigm!")
+                messagebox.showinfo("Success", "success")
             else:
                 self.status_label.config(text="No solution found.", fg="red")
                 messagebox.showerror("Failed", "No solution found.")
                 
         except RecursionError:
             self.status_label.config(text="Stack Overflow!", fg="red")
-            messagebox.showerror("Error", "Recursion Limit Exceeded!\nThis is a limitation of pure recursion for deep searches in Python.")
+            messagebox.showerror("Error", "Recursion Limit Exceeded!\nThis confirms this is a recursive solution.")
 
-if __name__ == "__main__":
+if __name__ == "_main_":
     root = tk.Tk()
     gui = EightPuzzleGUI(root)
     root.resizable(False, False)
